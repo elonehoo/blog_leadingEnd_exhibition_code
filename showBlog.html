@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" href="layui/css/layui.css" />
+	<head>
+		<meta charset="utf-8">
+		<title>展示博客</title>
+	</head>
+	<body>
+		<div id="app">
+			<div class="layui-container" style="margin-top: 2%; margin-left: 20%;">
+				<div class="layui-row layui-anim layui-anim-up">
+					<img :src="blogs.blogFirstFigure" style="width: 812px; height: 488px; margin-left: 100px; " />
+					<h2 style="margin-left: 406px; margin-top: 10px;">{{blogs.blogTitle}}</h2>
+					<div v-html="blogs.blogContent" style="margin-top: 10px;"></div>
+				</div>
+			</div>		
+		</div>
+	</body>
+	
+	<script src="layui/layui.js" ></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	
+	<script>
+		var app = new Vue({
+			el:"#app",
+			data:{
+				blogs:[],
+			},
+			created() {
+				this.show()
+			},
+			methods:{
+				show(){
+					var number = localStorage.getItem("blog");
+					// app.blogs = blog
+					axios.post('http://localhost:8080/blog/one', {
+						blogId:number,
+					})
+					.then(function (response) {
+						console.log(response.data.information);
+						app.blogs = response.data.information;
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+				},
+			}
+		})
+	</script>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" href="layui/css/layui.css" />
+	<head>
+		<meta charset="utf-8">
+		<title>首页</title>
+	</head>
+	<body >
+			<div id="app">
+				<!-- <img :src="portrait" /> -->
+				<div id="example" class="layui-layout layui-layout-admin" >
+				  <div class="layui-header">
+				    <div class="layui-logo">{{title}}</div>
+				    <!-- 头部区域（可配合layui已有的水平导航） -->
+				    
+				    <ul class="layui-nav layui-layout-right">
+				      <li class="layui-nav-item">
+				        <a href="javascript:;">
+				          <img :src="HeadPortrait" class="layui-nav-img">
+				          {{Nickname}}
+				        </a>
+				      </li>
+				    </ul>
+				  </div>
+				  
+				  <div class="layui-side layui-bg-black">
+				      <div class="layui-side-scroll">
+				        <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+				        <ul class="layui-nav layui-nav-tree"  lay-filter="filter">
+				          <li class="layui-nav-item layui-nav-itemed">
+				            <a class="" @click="getAll()" href="blogs.html" target="iframeMain">
+								<i class="layui-icon">&#xe705;</i>博客
+							</a>
+				            <dl class="layui-nav-child">
+								<dd v-for="item in items" @click="getOne(item)" :class="{'layui-this':item.isSelected}">
+									<a   href="blogs.html" target="iframeMain">
+										{{item.typeName}}
+									</a>
+								</dd>
+				            </dl>
+				          </li>
+							<li class="layui-nav-item layui-nav-itemed">
+								<a class="" href="leaveWord.html" target="iframeMain">
+									<i class="layui-icon">&#xe63c;</i>留言
+								</a>
+							</li>
+				      </div>
+				    </div>
+				    
+				    <div class="layui-body">
+				      <!-- 内容主体区域 -->
+				      <!-- <div style="padding: 15px;">内容主体区域</div> -->
+					  <iframe src="open.html" frameborder="0" class="layadmin-iframe" name="iframeMain" style="width: 100%; height:99%;"></iframe>
+				    </div>
+				    
+				    <div class="layui-footer">
+				      <!-- 底部固定区域 -->
+				      {{Nickname + "的博客"}}
+				    </div>
+				</div>
+			</div>
+		</body>
+	
+	<script src="layui/layui.all.js" type="module"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script >
+			export default{
+				name:"#example",
+				method(){
+					layui.use('element', function(){
+					  var element = layui.element;
+					  element.on('nav(filter)', function(elem){
+					    console.log(elem); //得到当前点击的DOM对象
+					  });
+					});
+				},
+			};
+		</script>
+		<script>
+			
+			var app = new Vue({
+				el:"#app",
+				data:{
+					Nickname:"",
+					HeadPortrait:"",
+					items:[],
+					title:""
+				},
+				created() {
+					this.show();
+				},
+				methods:{
+					show(){
+						axios.post('http://localhost:8080/user/session', {
+							
+						})
+						.then(function (response) {
+							app.Nickname = response.data.information.nickname;
+							app.HeadPortrait = response.data.information.headPortrait;
+							
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+						
+						
+						axios.post('http://localhost:8080/type/classifier', {
+							
+						})
+						.then(function (response) {
+							// console.log(response.data.information)
+							app.items = response.data.information;
+						})
+						.catch(function (error) {
+							console.log(error);
+						});							
+					},
+					getAll(){
+						localStorage.setItem("type","");
+					},
+					getOne(selectItem){
+						localStorage.setItem("type",selectItem.typeId);
+						app.title = selectItem.typeName;
+						app.items.forEach(item => {
+						item.isSelected = (item.typeId === selectItem.typeId);
+						})
+					},
+				},
+			})
+		</script>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" href="layui/css/layui.css" />
+	<head>
+		<meta charset="utf-8">
+		<title>博客</title>
+	</head>
+	<body style="background-color: #eeeeee ;">
+		<div id="app">
+			<div class="layui-container" style="margin-top: 2%; margin-left: 20%;">
+				<div class="layui-row layui-anim layui-anim-up">
+				  <!-- <fieldset v-for="item in items" class="layui-elem-field">
+					  <legend></legend>
+						<a>
+							<div class="layui-field-box">
+								<img :src="item.blogFirstFigure" class="layui-nav-img" id="demo1" style="width: 80px; height: 80px; float: left; margin-bottom: 10px;">
+								<h2>{{item.blogDescribe}}</h2>
+							</div>
+						</a>
+				  </fieldset> -->
+				  <div v-for="item in items" class="layui-card" style="height: 150px;">
+					<a @click="showBolg(item.blogId)">
+						<div class="layui-card-header">{{item.blogTitle}}</div>
+						<div class="layui-card-body">
+							<img :src="item.blogFirstFigure" class="layui-upload-img" id="demo1" style="width: 80px; height: 80px; float: left; margin-bottom: 10px;">
+							<h2 style="margin-left: 30px; float: left;">{{item.blogDescribe}}</h2>
+						</div>
+					</a>	
+				  </div>
+				</div>
+				<div id="test1" style="margin-left: 500px;"></div>
+			</div>
+		</div>
+	</body>
+	
+	<script src="layui/layui.js" ></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	
+	<script>
+		var app = new Vue({
+			el:"#app",
+			data:{
+				items:[],
+				pageTotal:"",
+				pagination:1,
+			},
+			created() {
+				this.show();
+			},
+			methods:{
+				show(){
+					var typeid = localStorage.getItem("type");
+					axios.post('http://localhost:8080/blog/classify', {
+						typeId:typeid,
+						pageNum:1
+					})
+					.then(function (response) {
+						console.log(response.data.information)
+						app.pageTotal =response.data.information.total
+						app.items = response.data.information.records;
+						app.$nextTick(function () {
+							app.paging();						
+						})						
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+				},
+				paging(){
+					layui.use('laypage', function(){
+						var laypage = layui.laypage;
+						//执行一个laypage实例
+						laypage.render({
+							elem: 'test1'
+							,count: app.pageTotal//数据总数，从服务端得到
+							,limit:5
+							,jump: function(obj, first){
+								app.pagination = obj.curr
+								//首次不执行
+								if(!first){
+									app.pag();
+								}
+							}
+						});
+					});				
+				},
+				pag(){
+					var typeid = localStorage.getItem("type");
+					axios.post('http://localhost:8080/blog/classify', {
+						typeId:typeid,
+						pageNum:app.pagination
+					})
+					.then(function (response) {
+						console.log(response.data.information);
+						app.pagintotal = response.data.information.total
+						app.items = response.data.information.records
+					})
+					.catch(function (error) {
+						console.log(error);
+					}); 				
+				},
+				showBolg(number){
+					localStorage.setItem("blog",number);
+					location.href = "showBlog.html";
+				}
+			},
+		})
+	</script>
+</html>

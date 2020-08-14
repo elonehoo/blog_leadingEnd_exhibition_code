@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" href="layui/css/layui.css" />
+	<head>
+		<meta charset="utf-8">
+		<title>留言板</title>
+	</head>
+	<body style="background-color: #eeeeee ;">
+		<div id="app">
+			<div class="layui-container" style="margin-top: 2%; margin-left: 20%;">
+				<div class="layui-row layui-anim layui-anim-up">
+					<div class="layui-form-item">
+					    <label class="layui-form-label">输入昵称</label>
+					    <div class="layui-input-inline">
+					      <input v-model="nickname" type="text" name="title" required  lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="layui-input">
+					    </div>
+					</div>
+					
+					<div class="layui-form-item">
+					    <label class="layui-form-label">输入邮箱</label>
+					    <div class="layui-input-inline">
+					      <input v-model="email" type="text" name="title" required  lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+					    </div>
+						<div class="layui-form-mid layui-word-aux">{{message}}</div>
+					</div>
+					
+					<div class="layui-form-item layui-form-text">
+					    <label class="layui-form-label">内容</label>
+					    <div class="layui-input-block" style="width: 500px;">
+					      <textarea v-model="content" name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+					    </div>
+					</div>
+					
+					<div class="layui-form-item" style="margin-left: 180px;">
+					    <div class="layui-input-block">
+							<button @click="mes()" class="layui-btn layui-btn-lg layui-btn-radius layui-btn-normal">
+								<i class="layui-icon">&#xe6b2;</i>留言
+							</button>
+					    </div>
+					  </div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="layui/layui.js" ></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script>
+		var app = new Vue({
+			el:"#app",
+			data:{
+				nickname:"",
+				email:"",
+				content:"",
+				message:"",
+			},
+			created() {
+				
+			},
+			methods:{
+				mes(){
+					axios.post('http://localhost:8080/message/insert', {
+						nickname:app.nickname,
+						email:app.email,
+						content:app.content
+					})
+					.then(function (response) {
+						console.log(response.data.information);
+						app.message = response.data.information;
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+				}
+			}
+		})
+	</script>
+</html>
